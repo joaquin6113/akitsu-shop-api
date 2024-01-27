@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String?  @db.VarChar(255)
+  lastname  String?  @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(300)
+  opinions   Opinion[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Product {
+  id               Int       @id @default(autoincrement())
+  name             String    @db.VarChar(255)
+  description      String?   @db.VarChar(255)
+  currentPrice     Float     @map("current_price") @db.Float
+  hasDiscount      Boolean   @default(false) @map("has_discount") @db.TinyInt
+  originalPrice    Float?    @map("original_price") @db.Float
+  category         String    @db.VarChar(50)
+  url              String?   @db.Text
+  opinions         Opinion[]
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model Opinion {
+  id               Int       @id @default(autoincrement())
+  textContent      String    @db.Text @map("text_content")
+  user             User      @relation(fields: [userId], references: [id])
+  userId           Int       @map("user_id")
+  product          Product   @relation(fields: [productId], references: [id])
+  productId        Int
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  @@map("opinions")
+}
